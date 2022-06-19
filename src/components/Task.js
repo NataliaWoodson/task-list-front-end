@@ -4,12 +4,17 @@ import PropTypes from 'prop-types';
 import './Task.css';
 
 // const Task = ({ id, title, isComplete }) => {
-const Task = ({ id, title, isComplete, setComplete }) => {
+const Task = ({ id, title, isComplete, setComplete, deletetask }) => {
   const buttonClass = isComplete ? 'tasks__item__toggle--completed' : '';
 
   const markComplete = () => {
     setComplete(id);
   };
+
+  const handleDelete = () => {
+    deletetask(id);
+  };
+
   return (
     <li className="tasks__item">
       <button
@@ -18,7 +23,9 @@ const Task = ({ id, title, isComplete, setComplete }) => {
       >
         {title}
       </button>
-      <button className="tasks__item__remove button">x</button>
+      <button onClick={handleDelete} className="tasks__item__remove button">
+        x
+      </button>
     </li>
   );
 };
@@ -28,6 +35,7 @@ Task.propTypes = {
   title: PropTypes.string.isRequired,
   isComplete: PropTypes.bool.isRequired,
   setComplete: PropTypes.func.isRequired,
+  deletetask: PropTypes.func.isRequired,
 };
 
 export default Task;

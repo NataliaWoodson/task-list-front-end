@@ -18,6 +18,15 @@ const App = () => {
     setTaskData(newTaskData);
   };
 
+  const deleteTask = (id) => {
+    const newTaskData = taskData.filter((task) => {
+      if (task.id !== id) {
+        return true;
+      }
+    });
+    setTaskData(newTaskData);
+  };
+
   return (
     <div className="App">
       <header className="App-header">
@@ -25,7 +34,11 @@ const App = () => {
       </header>
       <main>
         <div>
-          <TaskList tasks={taskData} setComplete={toggleComplete} />
+          <TaskList
+            tasks={taskData}
+            setComplete={toggleComplete}
+            deletetask={deleteTask}
+          />
         </div>
       </main>
     </div>
