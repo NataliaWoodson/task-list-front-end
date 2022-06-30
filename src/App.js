@@ -1,21 +1,93 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import TaskList from './components/TaskList.js';
 import './App.css';
-import TaskData from './tasks.json';
+// import TaskData from './tasks.json';
 import { useState } from 'react';
+import axios from 'axios';
+
+const kBaseUrl = 'http://localhost:5000';
+
+const taskApiToJson = (task) => {
+  const { description, id, title, is_complete: isComplete } = task;
+  return { description, id, title, isComplete };
+};
+
+const getTasks = () => {
+  return axios
+    .get(`${kBaseUrl}/tasks`) // promise1
+    .then((response) => {
+      return response.data.map(taskApiToJson);
+    }) // promise2
+    .catch((err) => {
+      console.log(err);
+    }); // promise3
+};
+
+const toggleComplete = (id) => {
+  return axios
+    .patch(`${kBaseUrl}/tasks/${id}/mark_complete`)
+    .then((response) => {
+      return taskApiToJson(response.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+const toggleIncomplete = (id) => {
+  return axios
+    .patch(`${kBaseUrl}/tasks/${id}/mark_incomplete`)
+    .then((response) => {
+      return taskApiToJson(response.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
 
 const App = () => {
-  const [taskData, setTaskData] = useState(TaskData);
+  const [taskData, setTaskData] = useState([]);
 
-  const toggleComplete = (id) => {
-    const newTaskData = TaskData.map((task) => {
-      if (task.id === id) {
-        return { ...task, isComplete: (task.isComplete = !task.isComplete) };
-      } else {
-        return task;
-      }
+  const updateTasks = () => {
+    getTasks().then((tasks) => {
+      setTaskData(tasks);
     });
-    setTaskData(newTaskData);
+  };
+
+  useEffect(() => {
+    updateTasks();
+  }, []);
+
+  const markComplete = (id) => {
+    toggleComplete(id).then((updatedTask) => {
+      const newTaskData = taskData.map((task) => {
+        if (task.id === id) {
+          return {
+            ...task,
+            isComplete: (updatedTask.isComplete = !task.isComplete),
+          };
+        } else {
+          return task;
+        }
+      });
+      setTaskData(newTaskData);
+    });
+  };
+
+  const markIncomplete = (id) => {
+    toggleIncomplete(id).then((updatedTask) => {
+      const newTaskData = taskData.map((task) => {
+        if (task.id === id) {
+          return {
+            ...task,
+            isComplete: (updatedTask.isComplete = !task.isComplete),
+          };
+        } else {
+          return task;
+        }
+      });
+      setTaskData(newTaskData);
+    });
   };
 
   const deleteTask = (id) => {
@@ -36,8 +108,9 @@ const App = () => {
         <div>
           <TaskList
             tasks={taskData}
-            setComplete={toggleComplete}
+            setComplete={markComplete}
             deletetask={deleteTask}
+            setIncomplete={markIncomplete}
           />
         </div>
       </main>
